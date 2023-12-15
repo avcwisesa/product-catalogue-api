@@ -1,8 +1,16 @@
 import psycopg
+import sys
+import tomllib
+
 from psycopg import sql
 
-DBNAME="product_catalogue_test"
-USER="avcwisesa"
+env = sys.argv[1]
+
+with open(f"{env}.toml", "rb") as f:
+    config = tomllib.load(f)
+
+    DBNAME = config['database']['name']
+    USER = config['database']['user']
 
 con = psycopg.connect(user=USER, host='localhost')
 con.autocommit = True
