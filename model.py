@@ -2,7 +2,8 @@ import psycopg
 from psycopg import sql
 
 class Product():
-    def __init__(self, sku, title, category, kondisi, qty, price):
+    def __init__(self, sku, title, category, kondisi, qty, price, id=None):
+        self.id = id
         self.sku = sku
         self.title = title
         self.category = category
@@ -24,3 +25,22 @@ class Product():
                 cur.execute(sql.SQL(insert_query))
 
                 conn.commit()
+
+    @classmethod
+    def get_by_id(cls, id):
+        get_query = f"""
+            SELECT sku, title, category, kondisi, qty, price, id
+            FROM product WHERE id = {id}
+        """
+
+        with psycopg.connect(f"dbname=product_catalogue_test user=avcwisesa") as conn:
+
+            with conn.cursor() as cur:
+
+                cur.execute(sql.SQL(get_query))
+                result = cur.fetchone()
+
+                if result is None:
+                    return None
+                else:
+                    return Product(*result)
