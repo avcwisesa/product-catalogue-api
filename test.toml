@@ -4,4 +4,4 @@ title = "Product Catalogue API"
 name = "product_catalogue_test"
 user = "avcwisesa"
 port = 5432
-host = localhost
+host = "localhost"
