@@ -3,3 +3,5 @@ title = "Product Catalogue API"
 [database]
 name = "product_catalogue_test"
 user = "avcwisesa"
+port = 5432
+host = localhost

@@ -1,5 +1,16 @@
-import psycopg
+from database import Database
+
 from psycopg import sql
+
+config = {
+    "database": {
+        "user": "avcwisesa",
+        "name": "product_catalogue_test",
+        "port": 5432,
+        "host": "localhost"
+    }
+}
+Database.init_db(config)
 
 class Product():
     def __init__(self, sku, title, category, kondisi, qty, price, id=None):
@@ -18,8 +29,7 @@ class Product():
                     '{self.kondisi}', {self.qty}, {self.price})
         """
 
-        with psycopg.connect(f"dbname=product_catalogue_test user=avcwisesa") as conn:
-
+        with Database.connection() as conn:
             with conn.cursor() as cur:
 
                 cur.execute(sql.SQL(insert_query))
@@ -33,7 +43,7 @@ class Product():
             FROM product WHERE id = {id}
         """
 
-        with psycopg.connect(f"dbname=product_catalogue_test user=avcwisesa") as conn:
+        with Database.connection() as conn:
 
             with conn.cursor() as cur:
 

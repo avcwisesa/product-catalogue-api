@@ -1,2 +1,3 @@
 # Local folders
 env/
+__pycache__
