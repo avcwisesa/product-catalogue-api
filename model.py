@@ -103,3 +103,22 @@ class Product():
                 cur.execute(sql.SQL(insert_query))
 
                 conn.commit()
+
+    def update(self):
+        update_query = """
+            UPDATE product
+            SET sku = %s,
+                title = %s,
+                category = %s,
+                kondisi = %s,
+                price = %s
+            WHERE id = %s;
+        """
+
+        with Database.connection() as conn:
+            with conn.cursor() as cur:
+
+                cur.execute(update_query,
+                            (self.sku, self.title, self.category, self.kondisi, self.price, self.id))
+
+                conn.commit()
