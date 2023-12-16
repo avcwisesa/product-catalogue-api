@@ -47,7 +47,7 @@ class Product():
         products = []
 
         search_query = cls._search_query(skus, titles, categories, conditions)
-        search_query += f" LIMIT {limit} OFFSET {offset}"
+        search_query += f"ORDER BY created_at DESC LIMIT {limit} OFFSET {offset}"
 
         with Database.connection() as conn:
 
@@ -93,15 +93,12 @@ class Product():
     def save(self):
         insert_query = f"""
             INSERT INTO product (sku, title, category, kondisi, qty, price)
-            VALUES ('{self.sku}', '{self.title}', '{self.category}',
-                    '{self.kondisi}', {self.qty}, {self.price})
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
 
         with Database.connection() as conn:
             with conn.cursor() as cur:
-
-                cur.execute(sql.SQL(insert_query))
-
+                cur.execute(insert_query, self._get_insert_args())
                 conn.commit()
 
     def update(self):
@@ -117,8 +114,13 @@ class Product():
 
         with Database.connection() as conn:
             with conn.cursor() as cur:
-
-                cur.execute(update_query,
-                            (self.sku, self.title, self.category, self.kondisi, self.price, self.id))
-
+                cur.execute(update_query, self._get_update_args())
                 conn.commit()
+
+    def _get_insert_args(self):
+        return (self.sku, self.title, self.category,
+                self.kondisi, self.qty, self.price)
+
+    def _get_update_args(self):
+        return (self.sku, self.title, self.category,
+                self.kondisi, self.price, self.id)
