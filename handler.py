@@ -63,8 +63,15 @@ def create_product():
         'product': new_product.toJSON()
     }, 200
 
+@jwt_required()
 def update_product(id):
+    user_id = get_jwt()['user_id']
     product = Product.get_by_id(id)
+
+    if user_id != product.tenant:
+        return {
+            'error': 'Product belongs to other tenant'
+        }, 403
 
     if product is None:
         return {'error': 'product not found'}, 404
