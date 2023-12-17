@@ -43,10 +43,14 @@ def get_product_by_id(id):
     except:
         return {}, 404
 
+@jwt_required()
 def create_product():
+    user_id = get_jwt()['user_id']
+
     try:
         product_params = request.get_json()
         new_product = Product.create_from_dict(product_params)
+        new_product.tenant = user_id
         product_id = new_product.save()
 
         new_product.id = product_id

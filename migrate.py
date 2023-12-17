@@ -120,4 +120,4 @@ seeds = [
 ]
 
 for seed in seeds:
-    seed.save(seed.tenant)
+    seed.save()

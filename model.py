@@ -113,6 +113,7 @@ class Product():
     @classmethod
     def create_from_dict(self, param_dict):
         new_product = Product(
+            None,
             param_dict.get('sku', None),
             param_dict.get('title', None),
             param_dict.get('category', None),
@@ -153,7 +154,7 @@ class Product():
 
         return search_query
 
-    def save(self, tenant):
+    def save(self):
         insert_query = f"""
             INSERT INTO product (sku, title, category, kondisi, qty, price, tenant)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -166,7 +167,7 @@ class Product():
         with Database.connection() as conn:
             with conn.cursor() as cur:
                 try:
-                    cur.execute(insert_query, self._get_insert_args(tenant))
+                    cur.execute(insert_query, self._get_insert_args())
                     product_id = cur.fetchone()[0]
                     conn.commit()
                 except errors.UniqueViolation:
@@ -204,8 +205,10 @@ class Product():
         }
 
     def _validate(self):
-        if (self.sku is None or self.title is None or self.category is None or
-            self.kondisi is None or self.qty is None or self.price is None):
+        print(self._get_insert_args())
+        if (self.sku is None or self.title is None or
+            self.category is None or self.kondisi is None or
+            self.qty is None or self.price is None or self.tenant is None):
             raise AttributeError("Missing product parameter")
 
         if self.kondisi not in Product.CONDITIONS:
@@ -214,9 +217,9 @@ class Product():
         if self.category not in Product.CATEGORIES:
             raise AttributeError(f"Invalid category: {self.category}")
 
-    def _get_insert_args(self, tenant):
+    def _get_insert_args(self):
         return (self.sku, self.title, self.category,
-                self.kondisi, self.qty, self.price, tenant)
+                self.kondisi, self.qty, self.price, self.tenant)
 
     def _get_update_args(self):
         return (self.sku, self.title, self.category,
