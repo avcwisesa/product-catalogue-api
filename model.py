@@ -14,6 +14,9 @@ config = {
 Database.init_db(config)
 
 class Product():
+    CATEGORIES = ['BOOK', 'COMPUTER', 'BAG']
+    CONDITIONS = ['NEW', 'PRE-LOVED']
+
     def __init__(self, sku, title, category, kondisi, qty, price, id=None):
         self.id = id
         self.sku = sku
@@ -111,9 +114,6 @@ class Product():
             param_dict.get('price', None)
         )
 
-        if not new_product._is_valid():
-            raise Exception("Invalid product")
-
         return new_product
 
     @classmethod
@@ -153,6 +153,8 @@ class Product():
             RETURNING id
         """
 
+        self._validate()
+
         product_id = None
         with Database.connection() as conn:
             with conn.cursor() as cur:
@@ -161,7 +163,7 @@ class Product():
                     product_id = cur.fetchone()[0]
                     conn.commit()
                 except errors.UniqueViolation:
-                    raise Exception(f"Duplicated SKU: {self.sku}")
+                    raise AttributeError(f"Duplicated SKU: {self.sku}")
 
         return product_id
 
@@ -175,6 +177,8 @@ class Product():
                 price = %s
             WHERE id = %s;
         """
+
+        self._validate()
 
         with Database.connection() as conn:
             with conn.cursor() as cur:
@@ -192,8 +196,16 @@ class Product():
             'price': self.price
         }
 
-    def _is_valid(self):
-        return True
+    def _validate(self):
+        if (self.sku is None or self.title is None or self.category is None or
+            self.kondisi is None or self.qty is None or self.price is None):
+            raise AttributeError("Missing product parameter")
+
+        if self.kondisi not in Product.CONDITIONS:
+            raise AttributeError(f"Invalid kondisi: {self.kondisi}")
+
+        if self.category not in Product.CATEGORIES:
+            raise AttributeError(f"Invalid category: {self.category}")
 
     def _get_insert_args(self):
         return (self.sku, self.title, self.category,

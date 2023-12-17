@@ -20,11 +20,16 @@ def get_product_by_id(id):
         return {}, 404
 
 def create_product():
-    product_params = request.get_json()
-    new_product = Product.create_from_dict(product_params)
-    product_id = new_product.save()
+    try:
+        product_params = request.get_json()
+        new_product = Product.create_from_dict(product_params)
+        product_id = new_product.save()
 
-    new_product.id = product_id
+        new_product.id = product_id
+    except AttributeError as e:
+        return {
+            'error': str(e)
+        }, 400
 
     return {
         'product': new_product.toJSON()
