@@ -47,7 +47,9 @@ class Product():
         products = []
 
         search_query = cls._search_query(skus, titles, categories, conditions)
-        search_query += f"ORDER BY created_at DESC LIMIT {limit} OFFSET {offset}"
+        search_query += " ORDER BY created_at DESC"
+        if limit != -1:
+            search_query += f" LIMIT {limit} OFFSET {offset}"
 
         with Database.connection() as conn:
 
@@ -59,6 +61,43 @@ class Product():
                 products = [Product(*result) for result in results]
 
         return products
+
+    @classmethod
+    def bulk_qty_update(cls, sku_qty_dict):
+        req_skus = list(sku_qty_dict.keys())
+        products = cls.search(skus=req_skus, limit=-1)
+        available_sku_qty_dict = {
+            product.sku: product.qty for product in products
+        }
+        available_skus = set(list(available_sku_qty_dict.keys()))
+
+        unavailable_skus = set(req_skus) - available_skus
+        if len(unavailable_skus) > 0:
+            raise Exception(f"SKU(s) not found: {unavailable_skus}")
+
+        insufficient_qty_skus = []
+        for req_sku, req_qty in sku_qty_dict.items():
+            if req_qty > available_sku_qty_dict[req_sku]:
+                insufficient_qty_skus.append(req_sku)
+
+        if insufficient_qty_skus:
+            raise Exception(f"Insufficient qty for SKU(s): {insufficient_qty_skus}")
+
+        available_sku_id_dict = {
+            product.sku: product.id for product in products
+        }
+        update_requests = [
+            (available_sku_qty_dict[req_sku] - req_qty, available_sku_id_dict[req_sku]) 
+            for req_sku, req_qty in sku_qty_dict.items()]
+
+        query = """
+            UPDATE product SET qty = %s WHERE id = %s;
+        """
+
+        with Database.connection() as conn:
+            with conn.cursor() as cur:
+                cur.executemany(query, update_requests)
+                conn.commit()
 
     @classmethod
     def _search_query(cls, skus=None, titles=None, categories=None, conditions=None):
