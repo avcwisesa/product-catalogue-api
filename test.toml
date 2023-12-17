@@ -5,3 +5,6 @@ DATABASE_NAME = "product_catalogue_test"
 DATABASE_USER = "avcwisesa"
 DATABASE_PORT = 5432
 DATABASE_HOST = "localhost"
+
+JWT_SECRET_KEY = "c41aa5e8d29a1a6418e77b51bfce4517"
+JWT_ACCESS_TOKEN_EXPIRES = "false"

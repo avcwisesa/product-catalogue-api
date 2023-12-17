@@ -16,7 +16,7 @@ python migrate.py test
 
 ### Development
 ```
-flask --app 'app:create_app("test")' run --port=8000
+flask --app 'app:create_app("test")' run --port=8000 --debug
 ```
 
 ### Production

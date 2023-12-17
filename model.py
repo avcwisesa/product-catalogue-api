@@ -7,8 +7,9 @@ class Product():
     CATEGORIES = ['BOOK', 'COMPUTER', 'BAG']
     CONDITIONS = ['NEW', 'PRE-LOVED']
 
-    def __init__(self, sku, title, category, kondisi, qty, price, id=None):
+    def __init__(self, tenant, sku, title, category, kondisi, qty, price, id=None):
         self.id = id
+        self.tenant = tenant
         self.sku = sku
         self.title = title
         self.category = category
@@ -19,7 +20,7 @@ class Product():
     @classmethod
     def get_by_id(cls, id):
         get_query = f"""
-            SELECT sku, title, category, kondisi, qty, price, id
+            SELECT tenant, sku, title, category, kondisi, qty, price, id
             FROM product WHERE id = {id}
         """
 
@@ -36,12 +37,13 @@ class Product():
                     return Product(*result)
 
     @classmethod
-    def search(cls, skus=None, titles=None, categories=None, conditions=None,
+    def search(cls, tenant, skus=None, titles=None, categories=None, conditions=None,
                limit=10, offset=0):
         products = []
 
-        select_columns = "sku, title, category, kondisi, qty, price, id"
-        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
+        select_columns = "tenant, sku, title, category, kondisi, qty, price, id"
+        search_query = cls._search_query(tenant, select_columns, skus,
+                                         titles, categories, conditions)
         search_query += " ORDER BY created_at DESC"
         if limit != -1:
             search_query += f" LIMIT {limit} OFFSET {offset}"
@@ -58,9 +60,10 @@ class Product():
         return products
 
     @classmethod
-    def get_count(cls, skus=None, titles=None, categories=None, conditions=None):
+    def get_count(cls, tenant, skus=None, titles=None, categories=None, conditions=None):
         select_columns = "count(1)"
-        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
+        search_query = cls._search_query(tenant, select_columns, skus,
+                                         titles, categories, conditions)
 
         count = 0
         with Database.connection() as conn:
@@ -73,9 +76,9 @@ class Product():
         return count
 
     @classmethod
-    def bulk_qty_update(cls, sku_qty_dict):
+    def bulk_qty_update(cls, tenant, sku_qty_dict):
         req_skus = list(sku_qty_dict.keys())
-        products = cls.search(skus=req_skus, limit=-1)
+        products = cls.search(tenant, skus=req_skus, limit=-1)
         available_sku_qty_dict = {
             product.sku: product.qty for product in products
         }
@@ -112,6 +115,7 @@ class Product():
     @classmethod
     def create_from_dict(self, param_dict):
         new_product = Product(
+            None,
             param_dict.get('sku', None),
             param_dict.get('title', None),
             param_dict.get('category', None),
@@ -123,10 +127,11 @@ class Product():
         return new_product
 
     @classmethod
-    def _search_query(cls, columns="*", skus=None, titles=None, categories=None, conditions=None):
+    def _search_query(cls, tenant, columns="*", skus=None, titles=None, categories=None, conditions=None):
         search_query = f"""
             SELECT {columns}
             FROM product
+            WHERE tenant = {tenant}
         """
 
         search_parameters = []
@@ -148,14 +153,14 @@ class Product():
                                      """)
 
         if search_parameters:
-            search_query += f" WHERE { ' AND '.join(search_parameters) }"
+            search_query += f" AND { ' AND '.join(search_parameters) }"
 
         return search_query
 
     def save(self):
         insert_query = f"""
-            INSERT INTO product (sku, title, category, kondisi, qty, price)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO product (sku, title, category, kondisi, qty, price, tenant)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id
         """
 
@@ -203,8 +208,10 @@ class Product():
         }
 
     def _validate(self):
-        if (self.sku is None or self.title is None or self.category is None or
-            self.kondisi is None or self.qty is None or self.price is None):
+        print(self._get_insert_args())
+        if (self.sku is None or self.title is None or
+            self.category is None or self.kondisi is None or
+            self.qty is None or self.price is None or self.tenant is None):
             raise AttributeError("Missing product parameter")
 
         if self.kondisi not in Product.CONDITIONS:
@@ -215,8 +222,32 @@ class Product():
 
     def _get_insert_args(self):
         return (self.sku, self.title, self.category,
-                self.kondisi, self.qty, self.price)
+                self.kondisi, self.qty, self.price, self.tenant)
 
     def _get_update_args(self):
         return (self.sku, self.title, self.category,
                 self.kondisi, self.price, self.id)
+
+class User():
+    def __init__(self, name, id=None):
+        self.name = name
+        self.id = id
+
+    @classmethod
+    def get_user_by_name(cls, name):
+        get_query = """
+            SELECT name, id
+            FROM tenant WHERE name = %s
+        """
+
+        with Database.connection() as conn:
+
+            with conn.cursor() as cur:
+
+                cur.execute(get_query, [name])
+                result = cur.fetchone()
+
+                if result is None:
+                    return None
+                else:
+                    return User(*result)

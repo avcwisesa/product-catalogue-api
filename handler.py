@@ -1,7 +1,12 @@
 from model import Product
+from model import User
 
+from flask import jsonify
 from flask import request
 from flask import current_app as app
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt
+from flask_jwt_extended import jwt_required
 
 def index():
     app_config = app.config.get_namespace('APP_')
@@ -10,19 +15,42 @@ def index():
         'env': app.config['ENV']
     }, 200
 
+def login():
+    username = request.json.get("username", None)
+    user = User.get_user_by_name(username)
+    if not user:
+        return jsonify({"msg": "Bad username"}), 401
+
+    additional_claims = {"user_id": user.id}
+    access_token = create_access_token(username, additional_claims=additional_claims)
+    return jsonify(access_token=access_token)
+
+@jwt_required()
 def get_product_by_id(id):
+    user_id = get_jwt()['user_id']
+
     try:
         product = Product.get_by_id(id)
+
+        if user_id != product.tenant:
+            return {
+                'error': 'Product belongs to other tenant'
+            }, 403
+
         return {
             'product': product.toJSON()
         }, 200
     except:
         return {}, 404
 
+@jwt_required()
 def create_product():
+    user_id = get_jwt()['user_id']
+
     try:
         product_params = request.get_json()
         new_product = Product.create_from_dict(product_params)
+        new_product.tenant = user_id
         product_id = new_product.save()
 
         new_product.id = product_id
@@ -35,8 +63,15 @@ def create_product():
         'product': new_product.toJSON()
     }, 200
 
+@jwt_required()
 def update_product(id):
+    user_id = get_jwt()['user_id']
     product = Product.get_by_id(id)
+
+    if user_id != product.tenant:
+        return {
+            'error': 'Product belongs to other tenant'
+        }, 403
 
     if product is None:
         return {'error': 'product not found'}, 404
@@ -67,7 +102,9 @@ def update_product(id):
 
     return {'product': product.toJSON()}, 200
 
+@jwt_required()
 def search_product():
+    user_id = get_jwt()['user_id']
     args = request.args
     skus = args.getlist('skus')
     titles = args.getlist('title')
@@ -79,15 +116,17 @@ def search_product():
     offset = (page - 1) * page_size
 
     count = Product.get_count(
+        user_id,
         skus=skus,
         titles=titles,
         categories=categories,
         conditions=conditions)
 
-    if offset >= count:
+    if offset >= count and page > 1:
         return {'error': 'Page out of range'}, 400
 
     products = Product.search(
+        user_id,
         skus=skus,
         titles=titles,
         categories=categories,
@@ -104,7 +143,9 @@ def search_product():
         'total': count
     }, 200
 
+@jwt_required()
 def bulk_request():
+    user_id = get_jwt()['user_id']
     bulk_request_params = request.get_json()
 
     try:
@@ -113,7 +154,7 @@ def bulk_request():
             for item in bulk_request_params['items']
         }
 
-        Product.bulk_qty_update(sku_qty_dict)
+        Product.bulk_qty_update(user_id, sku_qty_dict)
     except ValueError as e:
         return {
             'error': str(e)
