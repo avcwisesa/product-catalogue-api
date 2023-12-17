@@ -50,7 +50,8 @@ class Product():
                limit=10, offset=0):
         products = []
 
-        search_query = cls._search_query(skus, titles, categories, conditions)
+        select_columns = "sku, title, category, kondisi, qty, price, id"
+        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
         search_query += " ORDER BY created_at DESC"
         if limit != -1:
             search_query += f" LIMIT {limit} OFFSET {offset}"
@@ -65,6 +66,21 @@ class Product():
                 products = [Product(*result) for result in results]
 
         return products
+
+    @classmethod
+    def get_count(cls, skus=None, titles=None, categories=None, conditions=None):
+        select_columns = "count(1)"
+        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
+
+        count = 0
+        with Database.connection() as conn:
+
+            with conn.cursor() as cur:
+
+                cur.execute(sql.SQL(search_query))
+                count = cur.fetchone()[0]
+
+        return count
 
     @classmethod
     def bulk_qty_update(cls, sku_qty_dict):
@@ -117,9 +133,9 @@ class Product():
         return new_product
 
     @classmethod
-    def _search_query(cls, skus=None, titles=None, categories=None, conditions=None):
+    def _search_query(cls, columns="*", skus=None, titles=None, categories=None, conditions=None):
         search_query = f"""
-            SELECT sku, title, category, kondisi, qty, price, id
+            SELECT {columns}
             FROM product
         """
 

@@ -66,3 +66,29 @@ def update_product(id):
         }, 400
 
     return {'product': product.toJSON()}, 200
+
+def search_product():
+    skus = request.args.getlist('skus')
+    titles = request.args.getlist('title')
+    categories = request.args.getlist('category')
+    conditions = request.args.getlist('kondisi')
+
+    count = Product.get_count(
+        skus=skus,
+        titles=titles,
+        categories=categories,
+        conditions=conditions)
+    products = Product.search(
+        skus=skus,
+        titles=titles,
+        categories=categories,
+        conditions=conditions)
+
+    product_jsons = [product.toJSON() for product in products]
+
+    return {
+        'products': product_jsons,
+        'page_size': len(product_jsons),
+        'page': 1,
+        'total': count
+    }, 200
