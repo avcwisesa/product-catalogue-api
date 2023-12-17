@@ -68,21 +68,32 @@ def update_product(id):
     return {'product': product.toJSON()}, 200
 
 def search_product():
-    skus = request.args.getlist('skus')
-    titles = request.args.getlist('title')
-    categories = request.args.getlist('category')
-    conditions = request.args.getlist('kondisi')
+    args = request.args
+    skus = args.getlist('skus')
+    titles = args.getlist('title')
+    categories = args.getlist('category')
+    conditions = args.getlist('kondisi')
+
+    page_size = int(args.get('page_size'))
+    page = int(args.get('page', 1))
+    offset = (page - 1) * page_size
 
     count = Product.get_count(
         skus=skus,
         titles=titles,
         categories=categories,
         conditions=conditions)
+
+    if offset >= count:
+        return {'error': 'Page out of range'}, 400
+
     products = Product.search(
         skus=skus,
         titles=titles,
         categories=categories,
-        conditions=conditions)
+        conditions=conditions,
+        limit=page_size,
+        offset=offset)
 
     product_jsons = [product.toJSON() for product in products]
 
