@@ -16,5 +16,10 @@ python migrate.py test
 
 ### Development
 ```
-python app.py
+flask --app 'app:create_app("test")' run --port=8000
+```
+
+### Production
+```
+gunicorn -w 4 -b :8000 'app:create_app("test")'
 ```
