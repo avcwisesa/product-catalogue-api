@@ -27,8 +27,9 @@ if __name__ == "__main__":
     blueprint.route('/', methods=['GET'])(handler.index)
     blueprint.route('/product', methods=['POST'])(handler.create_product)
     blueprint.route('/product', methods=['GET'])(handler.search_product)
-    blueprint.route('/product/<id>', methods=['GET'])(handler.get_product_by_id)
-    blueprint.route('/product/<id>', methods=['PATCH'])(handler.update_product)
+    blueprint.route('/product/<int:id>', methods=['GET'])(handler.get_product_by_id)
+    blueprint.route('/product/<int:id>', methods=['PATCH'])(handler.update_product)
+    blueprint.route('/product/bulk_request', methods=['PATCH'])(handler.bulk_request)
 
     app.register_blueprint(blueprint)
     app.run(debug=True, port=app_config['port'])

@@ -93,7 +93,7 @@ class Product():
 
         unavailable_skus = set(req_skus) - available_skus
         if len(unavailable_skus) > 0:
-            raise Exception(f"SKU(s) not found: {unavailable_skus}")
+            raise ValueError(f"SKU(s) not found: {unavailable_skus}")
 
         insufficient_qty_skus = []
         for req_sku, req_qty in sku_qty_dict.items():
@@ -101,7 +101,7 @@ class Product():
                 insufficient_qty_skus.append(req_sku)
 
         if insufficient_qty_skus:
-            raise Exception(f"Insufficient qty for SKU(s): {insufficient_qty_skus}")
+            raise ValueError(f"Insufficient qty for SKU(s): {insufficient_qty_skus}")
 
         available_sku_id_dict = {
             product.sku: product.id for product in products

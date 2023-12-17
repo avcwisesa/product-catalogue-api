@@ -92,3 +92,20 @@ def search_product():
         'page': 1,
         'total': count
     }, 200
+
+def bulk_request():
+    bulk_request_params = request.get_json()
+
+    try:
+        sku_qty_dict = {
+            item['sku']: item['reqQty']
+            for item in bulk_request_params['items']
+        }
+
+        Product.bulk_qty_update(sku_qty_dict)
+    except ValueError as e:
+        return {
+            'error': str(e)
+        }, 400
+
+    return {'status': 'ok'}, 200
