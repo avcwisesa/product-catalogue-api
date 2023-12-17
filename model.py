@@ -1,6 +1,7 @@
 from database import Database
 
 from psycopg import sql
+from psycopg import errors
 
 config = {
     "database": {
@@ -137,8 +138,11 @@ class Product():
 
         with Database.connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(insert_query, self._get_insert_args())
-                conn.commit()
+                try:
+                    cur.execute(insert_query, self._get_insert_args())
+                    conn.commit()
+                except errors.UniqueViolation:
+                    raise Exception(f"Duplicated SKU: {self.sku}")
 
     def update(self):
         update_query = """
