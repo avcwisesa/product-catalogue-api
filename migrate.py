@@ -4,6 +4,7 @@ from model import Product
 import sys
 import tomllib
 
+import jwt
 import psycopg
 from psycopg import sql
 
@@ -25,6 +26,7 @@ with open(f"{env}.toml", "rb") as f:
     USER = config['DATABASE_USER']
     HOST = config['DATABASE_HOST']
     PORT = config['DATABASE_PORT']
+    SECRET = config['JWT_SECRET_KEY']
 
 con = psycopg.connect(user=USER, host=HOST)
 con.autocommit = True
@@ -91,6 +93,15 @@ with psycopg.connect(conn_str) as conn:
         """)
 
         conn.commit()
+
+users = [
+    {'id': 1, 'name': 'Tenant H'},
+    {'id': 2, 'name': 'Xavier School'}
+]
+
+for user in users:
+    token = jwt.encode(user, SECRET, algorithm='HS256')
+    print(f"User: {user['name']}\nToken: {token}")
 
 seeds = [
     Product(1, "ABC-123", "Produk 1", "BOOK", "NEW", 103, 2500),

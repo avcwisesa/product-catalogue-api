@@ -1,7 +1,12 @@
 from model import Product
+from model import User
 
+from flask import jsonify
 from flask import request
 from flask import current_app as app
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt
+from flask_jwt_extended import jwt_required
 
 def index():
     app_config = app.config.get_namespace('APP_')
@@ -10,9 +15,28 @@ def index():
         'env': app.config['ENV']
     }, 200
 
+def login():
+    username = request.json.get("username", None)
+    user = User.get_user_by_name(username)
+    if not user:
+        return jsonify({"msg": "Bad username"}), 401
+
+    additional_claims = {"user_id": user.id}
+    access_token = create_access_token(username, additional_claims=additional_claims)
+    return jsonify(access_token=access_token)
+
+@jwt_required()
 def get_product_by_id(id):
+    user_id = get_jwt()['user_id']
+
     try:
         product = Product.get_by_id(id)
+
+        if user_id != product.tenant:
+            return {
+                'error': 'Product belongs to other tenant'
+            }, 403
+
         return {
             'product': product.toJSON()
         }, 200
