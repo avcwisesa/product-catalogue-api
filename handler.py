@@ -34,3 +34,35 @@ def create_product():
     return {
         'product': new_product.toJSON()
     }, 200
+
+def update_product(id):
+    product = Product.get_by_id(id)
+
+    if product is None:
+        return {'error': 'product not found'}, 404
+
+    try:
+        product_params = request.get_json()
+
+        if product_params.get('sku') is not None:
+            product.sku = product_params.get('sku')
+
+        if product_params.get('title') is not None:
+            product.title = product_params.get('title')
+
+        if product_params.get('category') is not None:
+            product.category = product_params.get('category')
+
+        if product_params.get('kondisi') is not None:
+            product.kondisi = product_params.get('kondisi')
+
+        if product_params.get('price') is not None:
+            product.price = product_params.get('price')
+
+        product.update()
+    except AttributeError as e:
+        return {
+            'error': str(e)
+        }, 400
+
+    return {'product': product.toJSON()}, 200
