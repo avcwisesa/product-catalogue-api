@@ -76,9 +76,9 @@ class Product():
         return count
 
     @classmethod
-    def bulk_qty_update(cls, sku_qty_dict):
+    def bulk_qty_update(cls, tenant, sku_qty_dict):
         req_skus = list(sku_qty_dict.keys())
-        products = cls.search(skus=req_skus, limit=-1)
+        products = cls.search(tenant, skus=req_skus, limit=-1)
         available_sku_qty_dict = {
             product.sku: product.qty for product in products
         }

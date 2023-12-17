@@ -143,7 +143,9 @@ def search_product():
         'total': count
     }, 200
 
+@jwt_required()
 def bulk_request():
+    user_id = get_jwt()['user_id']
     bulk_request_params = request.get_json()
 
     try:
@@ -152,7 +154,7 @@ def bulk_request():
             for item in bulk_request_params['items']
         }
 
-        Product.bulk_qty_update(sku_qty_dict)
+        Product.bulk_qty_update(user_id, sku_qty_dict)
     except ValueError as e:
         return {
             'error': str(e)
