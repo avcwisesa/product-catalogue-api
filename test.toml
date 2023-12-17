@@ -1,7 +1,7 @@
-title = "Product Catalogue API"
+APP_TITLE = "Product Catalogue API"
+APP_PORT = 8000
 
-[database]
-name = "product_catalogue_test"
-user = "avcwisesa"
-port = 5432
-host = "localhost"
+DATABASE_NAME = "product_catalogue_test"
+DATABASE_USER = "avcwisesa"
+DATABASE_PORT = 5432
+DATABASE_HOST = "localhost"

@@ -11,10 +11,11 @@ env = sys.argv[1]
 with open(f"{env}.toml", "rb") as f:
     config = tomllib.load(f)
 
-    DBNAME = config['database']['name']
-    USER = config['database']['user']
+    DBNAME = config['DATABASE_NAME']
+    USER = config['DATABASE_USER']
+    HOST = config['DATABASE_HOST']
 
-con = psycopg.connect(user=USER, host='localhost')
+con = psycopg.connect(user=USER, host=HOST)
 con.autocommit = True
 
 cur = con.cursor()

@@ -16,5 +16,5 @@ python migrate.py test
 
 ### Development
 ```
-python app.py start
+python app.py
 ```
