@@ -25,6 +25,7 @@ if __name__ == "__main__":
     app.logger.info(f"Starting {app_config['title']} - {env}")
 
     blueprint.route('/', methods=['GET'])(handler.index)
+    blueprint.route('/product/<id>', methods=['GET'])(handler.get_product_by_id)
 
     app.register_blueprint(blueprint)
     app.run(debug=True, port=app_config['port'])

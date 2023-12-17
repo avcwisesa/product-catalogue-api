@@ -160,6 +160,17 @@ class Product():
                 cur.execute(update_query, self._get_update_args())
                 conn.commit()
 
+    def toJSON(self):
+        return {
+            'id': self.id,
+            'sku': self.sku,
+            'title': self.title,
+            'category': self.category,
+            'kondisi': self.kondisi,
+            'qty': self.qty,
+            'price': self.price
+        }
+
     def _get_insert_args(self):
         return (self.sku, self.title, self.category,
                 self.kondisi, self.qty, self.price)
