@@ -1,9 +1,10 @@
-import psycopg
+from database import Database
+from model import Product
+
 import sys
 import tomllib
 
-from model import Product
-
+import psycopg
 from psycopg import sql
 
 env = sys.argv[1]
@@ -11,9 +12,19 @@ env = sys.argv[1]
 with open(f"{env}.toml", "rb") as f:
     config = tomllib.load(f)
 
+    db_config = {
+        'name': config['DATABASE_NAME'],
+        'user': config['DATABASE_USER'],
+        'host': config['DATABASE_HOST'],
+        'port': config['DATABASE_PORT']
+    }
+
+    Database.init_db(db_config)
+
     DBNAME = config['DATABASE_NAME']
     USER = config['DATABASE_USER']
     HOST = config['DATABASE_HOST']
+    PORT = config['DATABASE_PORT']
 
 con = psycopg.connect(user=USER, host=HOST)
 con.autocommit = True
@@ -29,7 +40,10 @@ except psycopg.errors.InvalidCatalogName:
 db_create_query = f"CREATE DATABASE {DBNAME}"
 cur.execute(sql.SQL(db_create_query))
 
-with psycopg.connect(f"dbname={DBNAME} user={USER}") as conn:
+conn_str = f"""
+    host={HOST} port={PORT} dbname={DBNAME} user={USER}
+"""
+with psycopg.connect(conn_str) as conn:
 
     with conn.cursor() as cur:
 
@@ -64,11 +78,19 @@ with psycopg.connect(f"dbname={DBNAME} user={USER}") as conn:
         conn.commit()
 
 seeds = [
-    Product("ABC-123", "Produk 1", "cat 1", "kond 1", 3, 2500),
-    Product("ABZ-456", "Produk 2", "cat 2", "kond 1", 4, 5000),
-    Product("ABX-543", "Produk 3", "cat 3", "kond 2", 7, 10000),
-    Product("ABX-544", "Produk 4", "cat 3", "kond 2", 7, 11000),
-    Product("ABX-545", "Produk 5", "cat 3", "kond 1", 5, 12000)
+    Product("ABC-123", "Produk 1", "BOOK", "NEW", 103, 2500),
+    Product("ABZ-456", "Produk 2", "COMPUTER", "NEW", 104, 5000),
+    Product("ABX-543", "Produk 3", "BAG", "PRE-LOVED", 107, 10000),
+    Product("ABX-544", "Produk 4", "BAG", "PRE-LOVED", 107, 11000),
+    Product("ABX-545", "Produk 5", "BAG", "NEW", 105, 12000),
+    Product("APTX-0001", "buk 001", "BOOK", "NEW", 103, 2500),
+    Product("APTX-0002", "comp 002", "COMPUTER", "NEW", 104, 5000),
+    Product("APTX-0003", "bag 003", "BAG", "PRE-LOVED", 107, 10000),
+    Product("APTX-0004", "bag 004", "BAG", "PRE-LOVED", 107, 11000),
+    Product("APTX-0005", "bag 005", "BAG", "NEW", 105, 12000),
+    Product("COMPX321", "comp X1", "COMPUTER", "NEW", 100, 100000),
+    Product("COMPX322", "comp X2", "COMPUTER", "NEW", 100, 100000),
+    Product("COMPX323", "comp X3", "COMPUTER", "NEW", 100, 100000)
 ]
 
 for seed in seeds:

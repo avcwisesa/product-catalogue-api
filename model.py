@@ -3,16 +3,6 @@ from database import Database
 from psycopg import sql
 from psycopg import errors
 
-config = {
-    "database": {
-        "user": "avcwisesa",
-        "name": "product_catalogue_test",
-        "port": 5432,
-        "host": "localhost"
-    }
-}
-Database.init_db(config)
-
 class Product():
     CATEGORIES = ['BOOK', 'COMPUTER', 'BAG']
     CONDITIONS = ['NEW', 'PRE-LOVED']
