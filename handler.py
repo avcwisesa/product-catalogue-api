@@ -102,7 +102,9 @@ def update_product(id):
 
     return {'product': product.toJSON()}, 200
 
+@jwt_required()
 def search_product():
+    user_id = get_jwt()['user_id']
     args = request.args
     skus = args.getlist('skus')
     titles = args.getlist('title')
@@ -114,15 +116,17 @@ def search_product():
     offset = (page - 1) * page_size
 
     count = Product.get_count(
+        user_id,
         skus=skus,
         titles=titles,
         categories=categories,
         conditions=conditions)
 
-    if offset >= count:
+    if offset >= count and page > 1:
         return {'error': 'Page out of range'}, 400
 
     products = Product.search(
+        user_id,
         skus=skus,
         titles=titles,
         categories=categories,

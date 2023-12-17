@@ -37,12 +37,13 @@ class Product():
                     return Product(*result)
 
     @classmethod
-    def search(cls, skus=None, titles=None, categories=None, conditions=None,
+    def search(cls, tenant, skus=None, titles=None, categories=None, conditions=None,
                limit=10, offset=0):
         products = []
 
-        select_columns = "sku, title, category, kondisi, qty, price, id"
-        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
+        select_columns = "tenant, sku, title, category, kondisi, qty, price, id"
+        search_query = cls._search_query(tenant, select_columns, skus,
+                                         titles, categories, conditions)
         search_query += " ORDER BY created_at DESC"
         if limit != -1:
             search_query += f" LIMIT {limit} OFFSET {offset}"
@@ -59,9 +60,10 @@ class Product():
         return products
 
     @classmethod
-    def get_count(cls, skus=None, titles=None, categories=None, conditions=None):
+    def get_count(cls, tenant, skus=None, titles=None, categories=None, conditions=None):
         select_columns = "count(1)"
-        search_query = cls._search_query(select_columns, skus, titles, categories, conditions)
+        search_query = cls._search_query(tenant, select_columns, skus,
+                                         titles, categories, conditions)
 
         count = 0
         with Database.connection() as conn:
@@ -125,10 +127,11 @@ class Product():
         return new_product
 
     @classmethod
-    def _search_query(cls, columns="*", skus=None, titles=None, categories=None, conditions=None):
+    def _search_query(cls, tenant, columns="*", skus=None, titles=None, categories=None, conditions=None):
         search_query = f"""
             SELECT {columns}
             FROM product
+            WHERE tenant = {tenant}
         """
 
         search_parameters = []
@@ -150,7 +153,7 @@ class Product():
                                      """)
 
         if search_parameters:
-            search_query += f" WHERE { ' AND '.join(search_parameters) }"
+            search_query += f" AND { ' AND '.join(search_parameters) }"
 
         return search_query
 
