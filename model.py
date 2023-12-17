@@ -7,8 +7,9 @@ class Product():
     CATEGORIES = ['BOOK', 'COMPUTER', 'BAG']
     CONDITIONS = ['NEW', 'PRE-LOVED']
 
-    def __init__(self, sku, title, category, kondisi, qty, price, id=None):
+    def __init__(self, tenant, sku, title, category, kondisi, qty, price, id=None):
         self.id = id
+        self.tenant = tenant
         self.sku = sku
         self.title = title
         self.category = category
@@ -152,10 +153,10 @@ class Product():
 
         return search_query
 
-    def save(self):
+    def save(self, tenant):
         insert_query = f"""
-            INSERT INTO product (sku, title, category, kondisi, qty, price)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO product (sku, title, category, kondisi, qty, price, tenant)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id
         """
 
@@ -165,7 +166,7 @@ class Product():
         with Database.connection() as conn:
             with conn.cursor() as cur:
                 try:
-                    cur.execute(insert_query, self._get_insert_args())
+                    cur.execute(insert_query, self._get_insert_args(tenant))
                     product_id = cur.fetchone()[0]
                     conn.commit()
                 except errors.UniqueViolation:
@@ -213,10 +214,63 @@ class Product():
         if self.category not in Product.CATEGORIES:
             raise AttributeError(f"Invalid category: {self.category}")
 
-    def _get_insert_args(self):
+    def _get_insert_args(self, tenant):
         return (self.sku, self.title, self.category,
-                self.kondisi, self.qty, self.price)
+                self.kondisi, self.qty, self.price, tenant)
 
     def _get_update_args(self):
         return (self.sku, self.title, self.category,
                 self.kondisi, self.price, self.id)
+
+# class User():
+    # id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # email = db.Column(db.String(255), unique=True, nullable=False)
+    # password = db.Column(db.String(255), nullable=False)
+    # registered_on = db.Column(db.DateTime, nullable=False)
+    # admin = db.Column(db.Boolean, nullable=False, default=False)
+
+    # def __init__(self, email, password, admin=False):
+    #     self.email = email
+    #     self.password = bcrypt.generate_password_hash(
+    #         password, app.config.get('BCRYPT_LOG_ROUNDS')
+    #     ).decode()
+    #     self.registered_on = datetime.datetime.now()
+    #     self.admin = admin
+
+    # def encode_auth_token(self, user_id):
+    #     """
+    #     Generates the Auth Token
+    #     :return: string
+    #     """
+    #     try:
+    #         payload = {
+    #             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
+    #             'iat': datetime.datetime.utcnow(),
+    #             'sub': user_id
+    #         }
+    #         return jwt.encode(
+    #             payload,
+    #             app.config.get('SECRET_KEY'),
+    #             algorithm='HS256'
+    #         )
+    #     except Exception as e:
+    #         return e
+
+    # @staticmethod
+    # def decode_auth_token(auth_token):
+    #     """
+    #     Validates the auth token
+    #     :param auth_token:
+    #     :return: integer|string
+    #     """
+    #     try:
+    #         payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+    #         is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
+    #         if is_blacklisted_token:
+    #             return 'Token blacklisted. Please log in again.'
+    #         else:
+    #             return payload['sub']
+    #     except jwt.ExpiredSignatureError:
+    #         return 'Signature expired. Please log in again.'
+    #     except jwt.InvalidTokenError:
+    #         return 'Invalid token. Please log in again.'
