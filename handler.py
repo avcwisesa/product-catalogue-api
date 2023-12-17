@@ -1,5 +1,6 @@
 from model import Product
 
+from flask import request
 from flask import current_app as app
 
 def index():
@@ -17,3 +18,14 @@ def get_product_by_id(id):
         }, 200
     except:
         return {}, 404
+
+def create_product():
+    product_params = request.get_json()
+    new_product = Product.create_from_dict(product_params)
+    product_id = new_product.save()
+
+    new_product.id = product_id
+
+    return {
+        'product': new_product.toJSON()
+    }, 200

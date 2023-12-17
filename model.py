@@ -101,6 +101,22 @@ class Product():
                 conn.commit()
 
     @classmethod
+    def create_from_dict(self, param_dict):
+        new_product = Product(
+            param_dict.get('sku', None),
+            param_dict.get('title', None),
+            param_dict.get('category', None),
+            param_dict.get('kondisi', None),
+            param_dict.get('qty', None),
+            param_dict.get('price', None)
+        )
+
+        if not new_product._is_valid():
+            raise Exception("Invalid product")
+
+        return new_product
+
+    @classmethod
     def _search_query(cls, skus=None, titles=None, categories=None, conditions=None):
         search_query = f"""
             SELECT sku, title, category, kondisi, qty, price, id
@@ -134,15 +150,20 @@ class Product():
         insert_query = f"""
             INSERT INTO product (sku, title, category, kondisi, qty, price)
             VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id
         """
 
+        product_id = None
         with Database.connection() as conn:
             with conn.cursor() as cur:
                 try:
                     cur.execute(insert_query, self._get_insert_args())
+                    product_id = cur.fetchone()[0]
                     conn.commit()
                 except errors.UniqueViolation:
                     raise Exception(f"Duplicated SKU: {self.sku}")
+
+        return product_id
 
     def update(self):
         update_query = """
@@ -170,6 +191,9 @@ class Product():
             'qty': self.qty,
             'price': self.price
         }
+
+    def _is_valid(self):
+        return True
 
     def _get_insert_args(self):
         return (self.sku, self.title, self.category,
