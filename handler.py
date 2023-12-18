@@ -41,7 +41,9 @@ def get_product_by_id(id):
             'product': product.toJSON()
         }, 200
     except:
-        return {}, 404
+        return {
+            'error': 'Product not found'
+        }, 404
 
 @jwt_required()
 def create_product():
