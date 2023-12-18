@@ -29,12 +29,17 @@ python migrate.py test
 
 ### Development
 ```
-flask --app 'app:create_app("test")' run --port=8000 --debug
+flask --app 'app:create_app("src.test")' run --port=8000 --debug
+```
+
+#### Running test
+```
+pytest
 ```
 
 ### Production
 ```
-gunicorn -w 4 -b :8000 'app:create_app("test")'
+gunicorn -w 4 -b :8000 'app:create_app("src.test")'
 ```
 
 ## Documentation
@@ -51,3 +56,4 @@ When the web server is running, documentation can also be accessed through `/api
 - Maximum amount of Product ID to be handled is currently capped at PostgreSQL integer limit
 - Minimum to no parameter validation for API calls
 - Authentication method is on par with leaving ID card(hopefully a valid one) at Office Buildings in Jakarta as a guest
+- Only sample for test environment is present (`test.toml`)

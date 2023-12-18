@@ -1,4 +1,4 @@
-from database import Database
+from src.database import Database
 
 from psycopg import sql
 from psycopg import errors

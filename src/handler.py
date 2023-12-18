@@ -1,5 +1,5 @@
-from model import Product
-from model import User
+from src.model import Product
+from src.model import User
 
 from flask import jsonify
 from flask import request
