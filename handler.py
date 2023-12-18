@@ -112,42 +112,33 @@ def update_product(id):
 @jwt_required()
 def search_product():
     user_id = get_jwt()['user_id']
-    args = request.args
-    skus = args.getlist('sku')
-    titles = args.getlist('title')
-    categories = args.getlist('category')
-    conditions = args.getlist('kondisi')
 
-    sort = args.get('sort', 'desc')
-    if sort not in ['asc', 'desc']:
+    try:
+        params = _search_product_params_validation(request.args)
+    except Exception as e:
         return {
-            'error': 'Invalid parameter'
+            'error': str(e)
         }, 400
-    sort = sort.upper()
-
-    page_size = int(args.get('page_size', 10))
-    page = int(args.get('page', 1))
-    offset = (page - 1) * page_size
 
     count = Product.get_count(
         user_id,
-        skus=skus,
-        titles=titles,
-        categories=categories,
-        conditions=conditions)
+        skus=params['skus'],
+        titles=params['titles'],
+        categories=params['categories'],
+        conditions=params['conditions'])
 
-    if offset >= count and page > 1:
+    if params['offset'] >= count and params['page'] > 1:
         return {'error': 'Page out of range'}, 400
 
     products = Product.search(
         user_id,
-        skus=skus,
-        titles=titles,
-        categories=categories,
-        conditions=conditions,
-        limit=page_size,
-        offset=offset,
-        sort=sort)
+        skus=params['skus'],
+        titles=params['titles'],
+        categories=params['categories'],
+        conditions=params['conditions'],
+        limit=params['page_size'],
+        offset=params['offset'],
+        sort=params['sort'])
 
     product_jsons = [product.toJSON() for product in products]
 
@@ -157,6 +148,52 @@ def search_product():
         'page': 1,
         'total': count
     }, 200
+
+def _search_product_params_validation(args):
+    params = {}
+    errors = []
+
+    params['skus'] = args.getlist('sku')
+    params['titles'] = args.getlist('title')
+    params['categories'] = args.getlist('category')
+    params['conditions'] = args.getlist('kondisi')
+
+    for cat in params['categories']:
+        if cat not in Product.CATEGORIES:
+            errors.append('categories')
+            break
+
+    for cond in params['conditions']:
+        if cond not in Product.CONDITIONS:
+            errors.append('conditions')
+            break
+
+    sort = args.get('sort', 'desc')
+    if sort not in ['asc', 'desc']:
+        errors.append('sort')
+    else:
+        params['sort'] = sort
+
+    try:
+        page_size = int(args.get('page_size', 10))
+        if page_size < 1: raise Exception()
+        params['page_size'] = page_size
+    except:
+        errors.append('page_size')
+
+    try:
+        page = int(args.get('page', 1))
+        if page < 1: raise Exception()
+        params['page'] = page
+    except:
+        errors.append('page')
+
+    if len(errors) > 0:
+        raise Exception(f"Invalid parameter values: {errors}")
+
+    params['offset'] = (page - 1) * page_size
+
+    return params
 
 @jwt_required()
 def bulk_request():
