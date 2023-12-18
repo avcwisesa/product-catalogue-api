@@ -59,42 +59,66 @@
         "parameters": [
           {
             "in": "query",
+            "name": "sku",
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
             "name": "category",
-            "type": "string"
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BOOK",
+                "COMPUTER",
+                "BAG"
+              ]
+            }
           },
           {
             "in": "query",
             "name": "kondisi",
-            "type": "string"
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string",
+              "enum": [
+                "NEW",
+                "PRE-LOVED"
+              ]
+            }
           },
           {
             "in": "query",
+            "required": false,
             "name": "page_size",
-            "type": "string"
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
           },
           {
             "in": "query",
+            "required": false,
             "name": "page",
-            "type": "string"
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
           }
         ],
         "responses": {
           "200": {
             "description": "Products Found",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "page": {
@@ -180,20 +204,6 @@
           },
           "400": {
             "description": "Page out of range",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "error": {
@@ -257,20 +267,6 @@
         "responses": {
           "200": {
             "description": "Create Product Success",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "product": {
@@ -312,20 +308,6 @@
           },
           "400": {
             "description": "Invalid Parameter",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "error": {
@@ -361,20 +343,6 @@
         "responses": {
           "200": {
             "description": "Product Found",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "product": {
@@ -416,20 +384,6 @@
           },
           "403": {
             "description": "Product belongs to other tenant",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "error": {
@@ -509,20 +463,6 @@
         "responses": {
           "200": {
             "description": "Update Successful",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "product": {
@@ -564,20 +504,6 @@
           },
           "400": {
             "description": "Update Invalid Category",
-            "headers": {
-              "Connection": {
-                "type": "string"
-              },
-              "Content-Length": {
-                "type": "string"
-              },
-              "Date": {
-                "type": "string"
-              },
-              "Server": {
-                "type": "string"
-              }
-            },
             "schema": {
               "properties": {
                 "error": {
