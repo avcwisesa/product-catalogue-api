@@ -38,13 +38,13 @@ class Product():
 
     @classmethod
     def search(cls, tenant, skus=None, titles=None, categories=None, conditions=None,
-               limit=10, offset=0):
+               limit=10, offset=0, sort='asc'):
         products = []
 
         select_columns = "tenant, sku, title, category, kondisi, qty, price, id"
         search_query = cls._search_query(tenant, select_columns, skus,
                                          titles, categories, conditions)
-        search_query += " ORDER BY created_at DESC"
+        search_query += f" ORDER BY created_at {sort}"
         if limit != -1:
             search_query += f" LIMIT {limit} OFFSET {offset}"
 

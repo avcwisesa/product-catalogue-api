@@ -114,6 +114,20 @@
             "type": "integer",
             "minimum": 1,
             "default": 1
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "sort",
+            "type": "string",
+            "default": "desc",
+            "items": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
           }
         ],
         "responses": {

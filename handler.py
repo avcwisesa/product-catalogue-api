@@ -113,6 +113,13 @@ def search_product():
     categories = args.getlist('category')
     conditions = args.getlist('kondisi')
 
+    sort = args.get('sort', 'desc')
+    if sort not in ['asc', 'desc']:
+        return {
+            'error': 'Invalid parameter'
+        }, 400
+    sort = sort.upper()
+
     page_size = int(args.get('page_size', 10))
     page = int(args.get('page', 1))
     offset = (page - 1) * page_size
@@ -134,7 +141,8 @@ def search_product():
         categories=categories,
         conditions=conditions,
         limit=page_size,
-        offset=offset)
+        offset=offset,
+        sort=sort)
 
     product_jsons = [product.toJSON() for product in products]
 
