@@ -519,6 +519,89 @@
         "operationId": "updateProduct",
         "summary": "Update Product"
       }
+    },
+    "/product/bulk_request": {
+      "patch": {
+        "tags": [
+          "product"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "items": {
+                  "example": [
+                    {
+                      "reqQty": 1,
+                      "sku": "ABX-543"
+                    },
+                    {
+                      "reqQty": 4,
+                      "sku": "ABZ-999"
+                    },
+                    {
+                      "reqQty": 5,
+                      "sku": "SIDU-1109"
+                    }
+                  ],
+                  "items": {
+                    "properties": {
+                      "reqQty": {
+                        "example": 1,
+                        "type": "number"
+                      },
+                      "sku": {
+                        "example": "ABX-543",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bulk Update Success",
+            "schema": {
+              "properties": {
+                "status": {
+                  "example": "ok",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "SKU not found",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "SKU(s) not found: {'ABZ-999'}",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Bulk qty Update",
+        "operationId": "bulkQtyUpdate",
+        "summary": "Bulk qty Update"
+      }
     }
   },
   "tags": []

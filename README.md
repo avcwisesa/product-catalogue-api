@@ -23,3 +23,9 @@ flask --app 'app:create_app("test")' run --port=8000 --debug
 ```
 gunicorn -w 4 -b :8000 'app:create_app("test")'
 ```
+
+## Documentation
+
+[Swagger Document](/static/swagger.json)
+
+When the web server is running, documentation can also be accessed through `/apidocs`
