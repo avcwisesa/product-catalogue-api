@@ -1,6 +1,6 @@
-from database import Database
+from src.database import Database
 
-import handler
+import src.handler as handler
 import logging
 import tomllib
 
@@ -15,7 +15,7 @@ def create_app(env):
     blueprint = Blueprint('blueprint', __name__)
 
     app.config['ENV'] = env
-    app.config.from_file(f"{env}.toml", load=tomllib.load, text=False)
+    app.config.from_file(f"../{env}.toml", load=tomllib.load, text=False)
     app_config = app.config.get_namespace('APP_')
     db_config = app.config.get_namespace('DATABASE_')
 
