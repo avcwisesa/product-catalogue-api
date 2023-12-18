@@ -45,7 +45,7 @@ When the web server is running, documentation can also be accessed through `/api
 
 ## Appendix
 
-### Current Limitation
+### Current Limitation (non-exhaustive list)
 
 - User/tenant are only created during initial database migration or through manual database intervention
 - Maximum amount of Product ID to be handled is currently capped at PostgreSQL integer limit
