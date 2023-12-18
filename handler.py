@@ -70,6 +70,11 @@ def update_product(id):
     user_id = get_jwt()['user_id']
     product = Product.get_by_id(id)
 
+    if not product:
+        return {
+            'error': 'Product not available'
+        }, 400
+
     if user_id != product.tenant:
         return {
             'error': 'Product belongs to other tenant'

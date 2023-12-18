@@ -94,15 +94,6 @@ with psycopg.connect(conn_str) as conn:
 
         conn.commit()
 
-users = [
-    {'id': 1, 'name': 'Tenant H'},
-    {'id': 2, 'name': 'Xavier School'}
-]
-
-for user in users:
-    token = jwt.encode(user, SECRET, algorithm='HS256')
-    print(f"User: {user['name']}\nToken: {token}")
-
 seeds = [
     Product(1, "ABC-123", "Produk 1", "BOOK", "NEW", 103, 2500),
     Product(1, "ABZ-456", "Produk 2", "COMPUTER", "NEW", 104, 5000),

@@ -19,16 +19,16 @@ class Product():
 
     @classmethod
     def get_by_id(cls, id):
-        get_query = f"""
+        get_query = """
             SELECT tenant, sku, title, category, kondisi, qty, price, id
-            FROM product WHERE id = {id}
+            FROM product WHERE id = %s
         """
 
         with Database.connection() as conn:
 
             with conn.cursor() as cur:
 
-                cur.execute(sql.SQL(get_query))
+                cur.execute(get_query, [id])
                 result = cur.fetchone()
 
                 if result is None:
@@ -158,7 +158,7 @@ class Product():
         return search_query
 
     def save(self):
-        insert_query = f"""
+        insert_query = """
             INSERT INTO product (sku, title, category, kondisi, qty, price, tenant)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id
@@ -208,7 +208,6 @@ class Product():
         }
 
     def _validate(self):
-        print(self._get_insert_args())
         if (self.sku is None or self.title is None or
             self.category is None or self.kondisi is None or
             self.qty is None or self.price is None or self.tenant is None):
