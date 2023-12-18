@@ -41,7 +41,9 @@ def get_product_by_id(id):
             'product': product.toJSON()
         }, 200
     except:
-        return {}, 404
+        return {
+            'error': 'Product not found'
+        }, 404
 
 @jwt_required()
 def create_product():
@@ -106,12 +108,12 @@ def update_product(id):
 def search_product():
     user_id = get_jwt()['user_id']
     args = request.args
-    skus = args.getlist('skus')
+    skus = args.getlist('sku')
     titles = args.getlist('title')
     categories = args.getlist('category')
     conditions = args.getlist('kondisi')
 
-    page_size = int(args.get('page_size'))
+    page_size = int(args.get('page_size', 10))
     page = int(args.get('page', 1))
     offset = (page - 1) * page_size
 

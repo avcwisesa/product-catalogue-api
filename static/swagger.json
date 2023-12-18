@@ -1,0 +1,608 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "contact": {},
+    "title": "Product Catalogue API",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "securityDefinitions": {
+    "Bearers": {
+      "name": "bearer",
+      "type": "apiKey",
+      "in": "header"
+    }
+  },
+  "paths": {
+    "/login": {
+      "post": {
+        "security": [],
+        "tags": [
+          "auth"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "format": "binary",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "description": "Login",
+        "operationId": "login",
+        "summary": "Login"
+      }
+    },
+    "/product": {
+      "get": {
+        "tags": [
+          "product"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sku",
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string",
+              "enum": [
+                "BOOK",
+                "COMPUTER",
+                "BAG"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "kondisi",
+            "type": "array",
+            "uniqueItems": true,
+            "required": false,
+            "collectionFormat": "multi",
+            "items": {
+              "type": "string",
+              "enum": [
+                "NEW",
+                "PRE-LOVED"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "page_size",
+            "type": "integer",
+            "minimum": 1,
+            "default": 10
+          },
+          {
+            "in": "query",
+            "required": false,
+            "name": "page",
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products Found",
+            "schema": {
+              "properties": {
+                "page": {
+                  "example": 1,
+                  "type": "number"
+                },
+                "page_size": {
+                  "example": 3,
+                  "type": "number"
+                },
+                "products": {
+                  "example": [
+                    {
+                      "category": "BAG",
+                      "id": 5,
+                      "kondisi": "PRE-LOVED",
+                      "price": 12000,
+                      "qty": 95,
+                      "sku": "SIDU-1109",
+                      "title": "Produk 5"
+                    },
+                    {
+                      "category": "BAG",
+                      "id": 4,
+                      "kondisi": "PRE-LOVED",
+                      "price": 11000,
+                      "qty": 103,
+                      "sku": "ABX-544",
+                      "title": "Produk 4"
+                    },
+                    {
+                      "category": "BAG",
+                      "id": 3,
+                      "kondisi": "PRE-LOVED",
+                      "price": 10000,
+                      "qty": 105,
+                      "sku": "ABX-543",
+                      "title": "Produk 3"
+                    }
+                  ],
+                  "items": {
+                    "properties": {
+                      "category": {
+                        "example": "BAG",
+                        "type": "string"
+                      },
+                      "id": {
+                        "example": 5,
+                        "type": "number"
+                      },
+                      "kondisi": {
+                        "example": "PRE-LOVED",
+                        "type": "string"
+                      },
+                      "price": {
+                        "example": 12000,
+                        "type": "number"
+                      },
+                      "qty": {
+                        "example": 95,
+                        "type": "number"
+                      },
+                      "sku": {
+                        "example": "SIDU-1109",
+                        "type": "string"
+                      },
+                      "title": {
+                        "example": "Produk 5",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "total": {
+                  "example": 3,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Page out of range",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "Page out of range",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Search",
+        "operationId": "search",
+        "summary": "Search"
+      },
+      "post": {
+        "tags": [
+          "product"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "category": {
+                  "example": "BOOK",
+                  "type": "string"
+                },
+                "kondisi": {
+                  "example": "NEW",
+                  "type": "string"
+                },
+                "price": {
+                  "example": 11000,
+                  "type": "number"
+                },
+                "qty": {
+                  "example": 120,
+                  "type": "number"
+                },
+                "sku": {
+                  "example": "APTX-8885",
+                  "type": "string"
+                },
+                "title": {
+                  "example": "Obat susut",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Create Product Success",
+            "schema": {
+              "properties": {
+                "product": {
+                  "properties": {
+                    "category": {
+                      "example": "BOOK",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 16,
+                      "type": "number"
+                    },
+                    "kondisi": {
+                      "example": "NEW",
+                      "type": "string"
+                    },
+                    "price": {
+                      "example": 1412,
+                      "type": "number"
+                    },
+                    "qty": {
+                      "example": 120,
+                      "type": "number"
+                    },
+                    "sku": {
+                      "example": "APTX-4869",
+                      "type": "string"
+                    },
+                    "title": {
+                      "example": "Obat susut",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Invalid Parameter",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "Invalid category: MEDICINE",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Create Product",
+        "operationId": "createProduct",
+        "summary": "Create Product"
+      }
+    },
+    "/product/{productId}": {
+      "get": {
+        "tags": [
+          "product"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "type": "integer",
+            "name": "productId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product Found",
+            "schema": {
+              "properties": {
+                "product": {
+                  "properties": {
+                    "category": {
+                      "example": "BAG",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 5,
+                      "type": "number"
+                    },
+                    "kondisi": {
+                      "example": "PRE-LOVED",
+                      "type": "string"
+                    },
+                    "price": {
+                      "example": 12000,
+                      "type": "number"
+                    },
+                    "qty": {
+                      "example": 100,
+                      "type": "number"
+                    },
+                    "sku": {
+                      "example": "SIDU-1109",
+                      "type": "string"
+                    },
+                    "title": {
+                      "example": "Produk 5",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Product belongs to other tenant",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "Product belongs to other tenant",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "headers": {
+              "Connection": {
+                "type": "string"
+              },
+              "Content-Length": {
+                "type": "string"
+              },
+              "Date": {
+                "type": "string"
+              },
+              "Server": {
+                "type": "string"
+              }
+            },
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "Product not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Get Product By ID",
+        "operationId": "getProductById",
+        "summary": "Get Product By ID"
+      },
+      "patch": {
+        "tags": [
+          "product"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "type": "integer",
+            "name": "productId",
+            "required": true
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "category": {
+                  "example": "MEDICINE",
+                  "type": "string"
+                },
+                "sku": {
+                  "example": "APTX-1109",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update Successful",
+            "schema": {
+              "properties": {
+                "product": {
+                  "properties": {
+                    "category": {
+                      "example": "BAG",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 5,
+                      "type": "number"
+                    },
+                    "kondisi": {
+                      "example": "PRE-LOVED",
+                      "type": "string"
+                    },
+                    "price": {
+                      "example": 12000,
+                      "type": "number"
+                    },
+                    "qty": {
+                      "example": 100,
+                      "type": "number"
+                    },
+                    "sku": {
+                      "example": "SIDU-1109",
+                      "type": "string"
+                    },
+                    "title": {
+                      "example": "Produk 5",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Update Invalid Category",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "Invalid category: MEDICINE",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Update Product",
+        "operationId": "updateProduct",
+        "summary": "Update Product"
+      }
+    },
+    "/product/bulk_request": {
+      "patch": {
+        "tags": [
+          "product"
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "properties": {
+                "items": {
+                  "example": [
+                    {
+                      "reqQty": 1,
+                      "sku": "ABX-543"
+                    },
+                    {
+                      "reqQty": 4,
+                      "sku": "ABZ-999"
+                    },
+                    {
+                      "reqQty": 5,
+                      "sku": "SIDU-1109"
+                    }
+                  ],
+                  "items": {
+                    "properties": {
+                      "reqQty": {
+                        "example": 1,
+                        "type": "number"
+                      },
+                      "sku": {
+                        "example": "ABX-543",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bulk Update Success",
+            "schema": {
+              "properties": {
+                "status": {
+                  "example": "ok",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "SKU not found",
+            "schema": {
+              "properties": {
+                "error": {
+                  "example": "SKU(s) not found: {'ABZ-999'}",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "description": "Bulk qty Update",
+        "operationId": "bulkQtyUpdate",
+        "summary": "Bulk qty Update"
+      }
+    }
+  },
+  "tags": []
+}
